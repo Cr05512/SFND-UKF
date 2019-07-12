@@ -97,8 +97,6 @@ UKF::UKF() {
 
   time_us_ = 0.0;
   eps_ = 0.0;
-  NIS_radar_ = new std::vector<float>;
-  NIS_lidar_ = new std::vector<float>;
 }
 
 UKF::~UKF() {}
@@ -255,7 +253,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   S_ = MatrixXd(n_z_lid_,n_z_lid_);
 
   // transform sigma points into measurement space
-  for (int i = 0; i < 2*n_aug_+1; ++i) {  // 2n+1 sigma points
+  for (int i = 0; i < 2*n_aug_+1; ++i) {
     // measurement model
     Zsig(0,i) = Xsig_pred_(0,i);
     Zsig(1,i) = Xsig_pred_(1,i);                         
@@ -295,7 +293,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   z_diff = meas_package.raw_measurements_ - z_pred;
 
   eps_ = z_diff.transpose()*S_.inverse()*z_diff;
-  NIS_lidar_->push_back(eps_);
+  NIS_lidar_.push_back(eps_);
 
   // update state mean and covariance matrix
   x_ = x_ + K * z_diff;
@@ -376,7 +374,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
   while (z_diff(1)<-M_PI) z_diff(1)+=2.*M_PI;
 
   eps_ = z_diff.transpose()*S_.inverse()*z_diff;
-  NIS_radar_->push_back(eps_);
+  NIS_radar_.push_back(eps_);
 
   // update state mean and covariance matrix
   x_ = x_ + K * z_diff;

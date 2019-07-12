@@ -122,8 +122,8 @@ class UKF {
 
   Eigen::MatrixXd S_;
 
-  std::vector<float>* NIS_radar_;
-  std::vector<float>* NIS_lidar_;
+  std::vector<float> NIS_radar_;
+  std::vector<float> NIS_lidar_;
   float eps_;
 };
 
