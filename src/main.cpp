@@ -46,48 +46,108 @@ int main(int argc, char** argv)
 		std::vector<Car> cars = highway.getTraffic();
 		float lidarThresh = 5.991;
 		float radarThresh = 7.815;
-		float NISLength = cars[0].ukf.NIS_lidar_.size();
+		float NISLength = max(cars[0].ukf.NIS_lidar_.size(),cars[0].ukf.NIS_radar_.size());
+		bool usedRadar = cars[0].ukf.use_radar_;
+		bool usedLidar = cars[0].ukf.use_laser_;
+		uint8_t numOfSensors;
+		std::vector<float> lidarNISThresh(NISLength, lidarThresh);
+		std::vector<float> radarNISThresh(cars[0].ukf.NIS_radar_.size(), radarThresh);
+		if(usedLidar && usedRadar){
+			numOfSensors = 2;
+		}
+		else{
+			numOfSensors = 1;
+		}
 
-		std::vector<float> lidarNISThresh(NISLength, lidarThresh), radarNISThresh(NISLength, radarThresh);
-		Eigen::MatrixXi aboveThresholdCounts = Eigen::MatrixXi(cars.size(),2);
+		Eigen::MatrixXi aboveThresholdCounts = Eigen::MatrixXi(cars.size(),numOfSensors);
 		aboveThresholdCounts.fill(0);
 
 		matplotlibcpp::figure_size(1600,900);
 		matplotlibcpp::suptitle("NIS values over frames for each car and sensor");
 
 		for(int i=0; i<cars.size(); i++){
+			if(usedLidar && usedRadar){
+				matplotlibcpp::subplot(numOfSensors,cars.size(),i+1);
+				matplotlibcpp::plot(cars[i].ukf.NIS_lidar_);
+				matplotlibcpp::plot(lidarNISThresh,"r--");
+				matplotlibcpp::xlabel("frames");
+				matplotlibcpp::ylabel("NIS");
+				matplotlibcpp::grid(1);
 
-			matplotlibcpp::subplot(2,3,i+1);
-			matplotlibcpp::plot(cars[i].ukf.NIS_lidar_);
-			matplotlibcpp::plot(lidarNISThresh,"r--");
-			matplotlibcpp::xlabel("frames");
-			matplotlibcpp::ylabel("NIS");
-			matplotlibcpp::grid(1);
-			matplotlibcpp::subplot(2,3,i+3+1);
-			matplotlibcpp::plot(cars[i].ukf.NIS_radar_);
-			matplotlibcpp::plot(radarNISThresh,"r--");
-			matplotlibcpp::xlabel("frames");
-			matplotlibcpp::ylabel("NIS");
-			matplotlibcpp::grid(1);
-			for(int j=0; j<NISLength; j++){
-				if(cars[i].ukf.NIS_lidar_[j]>lidarThresh){
-					aboveThresholdCounts(i,0)++;
+				matplotlibcpp::subplot(numOfSensors,cars.size(),i+cars.size()+1);
+				matplotlibcpp::plot(cars[i].ukf.NIS_radar_);
+				matplotlibcpp::plot(radarNISThresh,"r--");
+				matplotlibcpp::xlabel("frames");
+				matplotlibcpp::ylabel("NIS");
+				matplotlibcpp::grid(1);
+			}
+			else{
+				if(usedLidar){
+					matplotlibcpp::subplot(numOfSensors,cars.size(),i+1);
+					matplotlibcpp::plot(cars[i].ukf.NIS_lidar_);
+					matplotlibcpp::plot(lidarNISThresh,"r--");
+					matplotlibcpp::xlabel("frames");
+					matplotlibcpp::ylabel("NIS");
+					matplotlibcpp::grid(1);
 				}
-				if(cars[i].ukf.NIS_radar_[j]>radarThresh){
-					aboveThresholdCounts(i,1)++;
+				else if(usedRadar){
+					matplotlibcpp::subplot(numOfSensors,cars.size(),i+1);
+					matplotlibcpp::plot(cars[i].ukf.NIS_radar_);
+					matplotlibcpp::plot(radarNISThresh,"r--");
+					matplotlibcpp::xlabel("frames");
+					matplotlibcpp::ylabel("NIS");
+					matplotlibcpp::grid(1);
+				}
+			}
+
+
+			for(int j=0; j<NISLength; j++){
+				if(usedLidar && usedRadar){
+					if(cars[i].ukf.NIS_lidar_[j]>lidarThresh){
+						aboveThresholdCounts(i,0)++;
+					}
+					if(cars[i].ukf.NIS_radar_[j]>radarThresh){
+						aboveThresholdCounts(i,1)++;
+					}
+				}
+				else{
+					if(usedLidar){
+						if(cars[i].ukf.NIS_lidar_[j]>lidarThresh){
+							aboveThresholdCounts(i,0)++;
+						}
+					}
+					else if(usedRadar){
+						if(cars[i].ukf.NIS_radar_[j]>radarThresh){
+							aboveThresholdCounts(i,0)++;
+						}
+					}
 				}
 			}
 		}
 
 		//std::cout << aboveThresholdCounts << std::endl;
-		Eigen::MatrixXd belowThreshPercentage = Eigen::MatrixXd(cars.size(),2);
+		Eigen::MatrixXd belowThreshPercentage = Eigen::MatrixXd(cars.size(),numOfSensors);
 		for(int i=0; i<cars.size(); i++){
-			belowThreshPercentage(i,0) = (NISLength-aboveThresholdCounts(i,0))/NISLength * 100;
-			belowThreshPercentage(i,1) = (NISLength-aboveThresholdCounts(i,1))/NISLength * 100;
-			matplotlibcpp::subplot(2,3,i+1);
-			matplotlibcpp::title("NIS Lidar Car "+std::to_string(i+1)+",  "+std::to_string(belowThreshPercentage(i,0))+"% below threshold");
-			matplotlibcpp::subplot(2,3,i+3+1);
-			matplotlibcpp::title("NIS Radar Car "+std::to_string(i+1)+",  "+std::to_string(belowThreshPercentage(i,1))+"% below threshold");
+			if(usedRadar && usedLidar){
+				belowThreshPercentage(i,0) = (NISLength-aboveThresholdCounts(i,0))/NISLength * 100;
+				belowThreshPercentage(i,1) = (NISLength-aboveThresholdCounts(i,1))/NISLength * 100;
+				matplotlibcpp::subplot(numOfSensors,cars.size(),i+1);
+				matplotlibcpp::title("NIS Lidar Car "+std::to_string(i+1)+",  "+std::to_string(belowThreshPercentage(i,0))+"% below threshold");
+				matplotlibcpp::subplot(numOfSensors,cars.size(),i+cars.size()+1);
+				matplotlibcpp::title("NIS Radar Car "+std::to_string(i+1)+",  "+std::to_string(belowThreshPercentage(i,1))+"% below threshold");
+			}
+			else{
+				if(usedLidar){
+					belowThreshPercentage(i,0) = (NISLength-aboveThresholdCounts(i,0))/NISLength * 100;
+					matplotlibcpp::subplot(numOfSensors,cars.size(),i+1);
+					matplotlibcpp::title("NIS Lidar Car "+std::to_string(i+1)+",  "+std::to_string(belowThreshPercentage(i,0))+"% below threshold");
+				}
+				else if(usedRadar){
+					belowThreshPercentage(i,0) = (NISLength-aboveThresholdCounts(i,0))/NISLength * 100;
+					matplotlibcpp::subplot(numOfSensors,cars.size(),i+1);
+					matplotlibcpp::title("NIS Radar Car "+std::to_string(i+1)+",  "+std::to_string(belowThreshPercentage(i,0))+"% below threshold");
+				}
+			}
 		}
 
 		matplotlibcpp::show();
