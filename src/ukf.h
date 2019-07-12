@@ -99,7 +99,8 @@ class UKF {
 
   Eigen::MatrixXd Q_;
 
-  Eigen::MatrixXd R_;
+  Eigen::MatrixXd R_radar_;
+  Eigen::MatrixXd R_lidar_;
 
   // Augmented state dimension
   int n_aug_;
@@ -120,6 +121,10 @@ class UKF {
   int n_z_rad_;
 
   Eigen::MatrixXd S_;
+
+  std::vector<float>* NIS_radar_;
+  std::vector<float>* NIS_lidar_;
+  float eps_;
 };
 
 #endif  // UKF_H

@@ -4,6 +4,7 @@
 
 //#include "render/render.h"
 #include "highway.h"
+#include "matplotlib-cpp/matplotlibcpp.h"
 
 int main(int argc, char** argv)
 {
@@ -39,5 +40,24 @@ int main(int argc, char** argv)
 		time_us = 1000000*frame_count/frame_per_sec;
 		
 	}
+	std::vector<Car> cars = highway.getTraffic();
+
+	std::vector<float> lidarNISThresh(cars[0].ukf.NIS_lidar_->size(),5.991), radarNISThresh(cars[0].ukf.NIS_radar_->size(),7.815);
+
+	for(int i=0; i<cars.size(); i++){
+
+		matplotlibcpp::subplot(2,3,i+1);
+		matplotlibcpp::plot(*cars[i].ukf.NIS_lidar_);
+		matplotlibcpp::plot(lidarNISThresh,"r--");
+		matplotlibcpp::title("NIS Lidar Car "+std::to_string(i+1));
+		matplotlibcpp::grid(1);
+		matplotlibcpp::subplot(2,3,i+3+1);
+		matplotlibcpp::plot(*cars[i].ukf.NIS_radar_);
+		matplotlibcpp::plot(radarNISThresh,"r--");
+		matplotlibcpp::title("NIS Radar Car "+std::to_string(i+1));
+		matplotlibcpp::grid(1);
+	}
+
+    matplotlibcpp::show();
 
 }

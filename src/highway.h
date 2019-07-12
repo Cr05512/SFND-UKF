@@ -22,8 +22,8 @@ public:
 	// Set which cars to track with UKF
 	std::vector<bool> trackCars = {true,true,true};
 	// Visualize sensor measurements
-	bool visualize_lidar = true;
-	bool visualize_radar = true;
+	bool visualize_lidar = false;
+	bool visualize_radar = false;
 	bool visualize_pcd = false;
 	// Predict path in the future using UKF
 	double projectedTime = 2;
@@ -187,6 +187,10 @@ public:
 				viewer->addText("Vy: "+std::to_string(rmseFailLog[3]), 30, 50, 20, 1, 0, 0, "rmse_fail_vy");
 		}
 		
+	}
+
+	std::vector<Car> getTraffic(){
+		return traffic;
 	}
 	
 };
