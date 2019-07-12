@@ -3,7 +3,6 @@ Sensor Fusion UKF Highway Project Starter Code
 
 <img src="media/ukf_highway_tracked.gif" width="700" height="400" />
 
-In this project you will implement an Unscented Kalman Filter to estimate the state of multiple cars on a highway using noisy lidar and radar measurements. Passing the project requires obtaining RMSE values that are lower that the tolerance outlined in the project rubric. 
 
 The main program can be built and ran by doing the following from the project top directory.
 
@@ -40,6 +39,7 @@ The red spheres above cars represent the (x,y) lidar detection and the purple li
   * Mac: same deal as make - [install Xcode command line tools](https://developer.apple.com/xcode/features/)
   * Windows: recommend using [MinGW](http://www.mingw.org/)
  * PCL 1.2
+ * Python 2.7 
 
 ## Basic Build Instructions
 
