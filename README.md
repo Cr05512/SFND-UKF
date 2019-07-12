@@ -1,5 +1,5 @@
 # SFND_Unscented_Kalman_Filter
-Sensor Fusion UKF Highway Project Starter Code
+Sensor Fusion UKF Highway Project Code
 
 <img src="media/ukf_highway_tracked.gif" width="700" height="400" />
 
@@ -35,7 +35,7 @@ The red spheres above cars represent the (x,y) lidar detection and the purple li
   * Mac: same deal as make - [install Xcode command line tools](https://developer.apple.com/xcode/features/)
   * Windows: recommend using [MinGW](http://www.mingw.org/)
  * PCL 1.2
- * Python 2.7 
+ * Python 2.7 (needed for NIS plots)
 
 ## Basic Build Instructions
 
@@ -44,29 +44,3 @@ The red spheres above cars represent the (x,y) lidar detection and the purple li
 3. Compile: `cmake .. && make`
 4. Run it: `./ukf_highway`
 
-## Editor Settings
-
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
-
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
-
-## Code Style
-
-Please stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html) as much as possible.
-
-## Generating Additional Data
-
-This is optional!
-
-If you'd like to generate your own radar and lidar modify the code in `highway.h` to alter the cars. Also check out `tools.cpp` to
-change how measurements are taken, for instance lidar markers could be the (x,y) center of bounding boxes by scanning the PCD environment
-and performing clustering. This is similar to what was done in Sensor Fusion Lidar Obstacle Detection.
-
-## Project Instructions and Rubric
-
-This information is only accessible by people who are already enrolled in Sensor Fusion. 
-If you are enrolled, see the project page in the classroom
-for instructions and the project rubric.
