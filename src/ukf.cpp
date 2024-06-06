@@ -228,7 +228,7 @@ void UKF::Prediction(double delta_t) {
   VectorXd psi = VectorXd(n_x_);
   P_.fill(0.0);
   for(int j=0; j<2*n_aug_+1;j++){
-      psi = Xsig_pred_.col(j)-x_;
+      psi = Xsig_pred_.col(j)-x_pred_;
       while (psi(3)> M_PI) psi(3)-=2.*M_PI;
       while (psi(3)<-M_PI) psi(3)+=2.*M_PI;
       P_ = P_ + weights_(j)*psi*psi.transpose();
